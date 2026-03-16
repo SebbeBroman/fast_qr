@@ -1,5 +1,33 @@
 let wasm;
 
+function addToExternrefTable0(obj) {
+    const idx = wasm.__externref_table_alloc();
+    wasm.__wbindgen_export_2.set(idx, obj);
+    return idx;
+}
+
+function handleError(f, args) {
+    try {
+        return f.apply(this, args);
+    } catch (e) {
+        const idx = addToExternrefTable0(e);
+        wasm.__wbindgen_exn_store(idx);
+    }
+}
+
+function isLikeNone(x) {
+    return x === undefined || x === null;
+}
+
+let cachedDataViewMemory0 = null;
+
+function getDataViewMemory0() {
+    if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer.detached === true || (cachedDataViewMemory0.buffer.detached === undefined && cachedDataViewMemory0.buffer !== wasm.memory.buffer)) {
+        cachedDataViewMemory0 = new DataView(wasm.memory.buffer);
+    }
+    return cachedDataViewMemory0;
+}
+
 const cachedTextDecoder = (typeof TextDecoder !== 'undefined' ? new TextDecoder('utf-8', { ignoreBOM: true, fatal: true }) : { decode: () => { throw Error('TextDecoder not available') } } );
 
 if (typeof TextDecoder !== 'undefined') { cachedTextDecoder.decode(); };
@@ -74,24 +102,6 @@ function passStringToWasm0(arg, malloc, realloc) {
     return ptr;
 }
 
-function getArrayU8FromWasm0(ptr, len) {
-    ptr = ptr >>> 0;
-    return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
-}
-/**
- * Generate a QR code from a string. All parameters are automatically set.
- * @param {string} content
- * @returns {Uint8Array}
- */
-export function qr(content) {
-    const ptr0 = passStringToWasm0(content, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.qr(ptr0, len0);
-    var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
-    return v2;
-}
-
 let cachedFloat64ArrayMemory0 = null;
 
 function getFloat64ArrayMemory0() {
@@ -113,6 +123,57 @@ function _assertClass(instance, klass) {
         throw new Error(`expected instance of ${klass.name}`);
     }
 }
+
+function getArrayU8FromWasm0(ptr, len) {
+    ptr = ptr >>> 0;
+    return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
+}
+/**
+ * Generate a PNG QR code from a string.
+ * @param {string} content
+ * @param {SvgOptions} options
+ * @returns {Uint8Array}
+ */
+export function qr_image(content, options) {
+    const ptr0 = passStringToWasm0(content, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    _assertClass(options, SvgOptions);
+    var ptr1 = options.__destroy_into_raw();
+    const ret = wasm.qr_image(ptr0, len0, ptr1);
+    var v3 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+    return v3;
+}
+
+/**
+ * Generate a tiny grayscale PNG QR code from a string.
+ * @param {string} content
+ * @param {any} options
+ * @returns {Uint8Array}
+ */
+export function qr_smol_image(content, options) {
+    const ptr0 = passStringToWasm0(content, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.qr_smol_image(ptr0, len0, options);
+    var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+    return v2;
+}
+
+/**
+ * Generate a QR code from a string. All parameters are automatically set.
+ * @param {string} content
+ * @returns {Uint8Array}
+ */
+export function qr(content) {
+    const ptr0 = passStringToWasm0(content, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.qr(ptr0, len0);
+    var v2 = getArrayU8FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 1, 1);
+    return v2;
+}
+
 /**
  * Generate a QR code from a string. All parameters are automatically set.
  * @param {string} content
@@ -401,13 +462,13 @@ export class SvgOptions {
         wasm.__wbg_svgoptions_free(ptr, 0);
     }
     /**
-     * Updates the shape of the QRCode modules.
-     * @param {Shape} shape
+     * Updates the size of the image. (unit being module size).
+     * @param {number} size
      * @returns {SvgOptions}
      */
-    shape(shape) {
+    image_size(size) {
         const ptr = this.__destroy_into_raw();
-        const ret = wasm.svgoptions_shape(ptr, shape);
+        const ret = wasm.svgoptions_image_size(ptr, size);
         return SvgOptions.__wrap(ret);
     }
     /**
@@ -423,13 +484,15 @@ export class SvgOptions {
         return SvgOptions.__wrap(ret);
     }
     /**
-     * Updates the margin of the QRCode.
-     * @param {number} margin
+     * Updates the position of the image. Takes an array [x, y] (unit being module size).
+     * @param {Float64Array} image_position
      * @returns {SvgOptions}
      */
-    margin(margin) {
+    image_position(image_position) {
         const ptr = this.__destroy_into_raw();
-        const ret = wasm.svgoptions_margin(ptr, margin);
+        const ptr0 = passArrayF64ToWasm0(image_position, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.svgoptions_image_position(ptr, ptr0, len0);
         return SvgOptions.__wrap(ret);
     }
     /**
@@ -442,18 +505,6 @@ export class SvgOptions {
         const ptr0 = passStringToWasm0(background_color, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         const ret = wasm.svgoptions_background_color(ptr, ptr0, len0);
-        return SvgOptions.__wrap(ret);
-    }
-    /**
-     * Updates the image of the QRCode. Takes base64 or a url.
-     * @param {string} image
-     * @returns {SvgOptions}
-     */
-    image(image) {
-        const ptr = this.__destroy_into_raw();
-        const ptr0 = passStringToWasm0(image, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.svgoptions_image(ptr, ptr0, len0);
         return SvgOptions.__wrap(ret);
     }
     /**
@@ -479,38 +530,6 @@ export class SvgOptions {
         return SvgOptions.__wrap(ret);
     }
     /**
-     * Updates the size of the image. (unit being module size).
-     * @param {number} size
-     * @returns {SvgOptions}
-     */
-    image_size(size) {
-        const ptr = this.__destroy_into_raw();
-        const ret = wasm.svgoptions_image_size(ptr, size);
-        return SvgOptions.__wrap(ret);
-    }
-    /**
-     * Updates the gap between background color and the image. (unit being module size).
-     * @param {number} gap
-     * @returns {SvgOptions}
-     */
-    image_gap(gap) {
-        const ptr = this.__destroy_into_raw();
-        const ret = wasm.svgoptions_image_gap(ptr, gap);
-        return SvgOptions.__wrap(ret);
-    }
-    /**
-     * Updates the position of the image. Takes an array [x, y] (unit being module size).
-     * @param {Float64Array} image_position
-     * @returns {SvgOptions}
-     */
-    image_position(image_position) {
-        const ptr = this.__destroy_into_raw();
-        const ptr0 = passArrayF64ToWasm0(image_position, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.svgoptions_image_position(ptr, ptr0, len0);
-        return SvgOptions.__wrap(ret);
-    }
-    /**
      * Updates the error correction level of the QRCode (can increase the size of the QRCode)
      * @param {ECL} ecl
      * @returns {SvgOptions}
@@ -518,6 +537,47 @@ export class SvgOptions {
     ecl(ecl) {
         const ptr = this.__destroy_into_raw();
         const ret = wasm.svgoptions_ecl(ptr, ecl);
+        return SvgOptions.__wrap(ret);
+    }
+    /**
+     * Creates a new SvgOptions object.
+     */
+    constructor() {
+        const ret = wasm.svgoptions_new();
+        this.__wbg_ptr = ret >>> 0;
+        SvgOptionsFinalization.register(this, this.__wbg_ptr, this);
+        return this;
+    }
+    /**
+     * Updates the image of the QRCode. Takes base64 or a url.
+     * @param {string} image
+     * @returns {SvgOptions}
+     */
+    image(image) {
+        const ptr = this.__destroy_into_raw();
+        const ptr0 = passStringToWasm0(image, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.svgoptions_image(ptr, ptr0, len0);
+        return SvgOptions.__wrap(ret);
+    }
+    /**
+     * Updates the shape of the QRCode modules.
+     * @param {Shape} shape
+     * @returns {SvgOptions}
+     */
+    shape(shape) {
+        const ptr = this.__destroy_into_raw();
+        const ret = wasm.svgoptions_shape(ptr, shape);
+        return SvgOptions.__wrap(ret);
+    }
+    /**
+     * Updates the margin of the QRCode.
+     * @param {number} margin
+     * @returns {SvgOptions}
+     */
+    margin(margin) {
+        const ptr = this.__destroy_into_raw();
+        const ret = wasm.svgoptions_margin(ptr, margin);
         return SvgOptions.__wrap(ret);
     }
     /**
@@ -531,13 +591,14 @@ export class SvgOptions {
         return SvgOptions.__wrap(ret);
     }
     /**
-     * Creates a new SvgOptions object.
+     * Updates the gap between background color and the image. (unit being module size).
+     * @param {number} gap
+     * @returns {SvgOptions}
      */
-    constructor() {
-        const ret = wasm.svgoptions_new();
-        this.__wbg_ptr = ret >>> 0;
-        SvgOptionsFinalization.register(this, this.__wbg_ptr, this);
-        return this;
+    image_gap(gap) {
+        const ptr = this.__destroy_into_raw();
+        const ret = wasm.svgoptions_image_gap(ptr, gap);
+        return SvgOptions.__wrap(ret);
     }
 }
 
@@ -575,8 +636,12 @@ async function __wbg_load(module, imports) {
 function __wbg_get_imports() {
     const imports = {};
     imports.wbg = {};
+    imports.wbg.__wbg_get_67b2ba62fc30de12 = function() { return handleError(function (arg0, arg1) {
+        const ret = Reflect.get(arg0, arg1);
+        return ret;
+    }, arguments) };
     imports.wbg.__wbindgen_init_externref_table = function() {
-        const table = wasm.__wbindgen_export_0;
+        const table = wasm.__wbindgen_export_2;
         const offset = table.grow(4);
         table.set(0, undefined);
         table.set(offset + 0, undefined);
@@ -584,6 +649,24 @@ function __wbg_get_imports() {
         table.set(offset + 2, true);
         table.set(offset + 3, false);
         ;
+    };
+    imports.wbg.__wbindgen_is_null = function(arg0) {
+        const ret = arg0 === null;
+        return ret;
+    };
+    imports.wbg.__wbindgen_is_undefined = function(arg0) {
+        const ret = arg0 === undefined;
+        return ret;
+    };
+    imports.wbg.__wbindgen_number_get = function(arg0, arg1) {
+        const obj = arg1;
+        const ret = typeof(obj) === 'number' ? obj : undefined;
+        getDataViewMemory0().setFloat64(arg0 + 8 * 1, isLikeNone(ret) ? 0 : ret, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, !isLikeNone(ret), true);
+    };
+    imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
+        const ret = getStringFromWasm0(arg0, arg1);
+        return ret;
     };
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
@@ -599,6 +682,7 @@ function __wbg_init_memory(imports, memory) {
 function __wbg_finalize_init(instance, module) {
     wasm = instance.exports;
     __wbg_init.__wbindgen_wasm_module = module;
+    cachedDataViewMemory0 = null;
     cachedFloat64ArrayMemory0 = null;
     cachedUint8ArrayMemory0 = null;
 

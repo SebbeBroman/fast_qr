@@ -96,7 +96,11 @@ mod polynomials;
 #[macro_use]
 pub mod qr;
 mod score;
+mod smol_png;
 mod version;
+
+#[cfg(not(target_arch = "wasm32"))]
+mod node;
 
 #[cfg(test)]
 mod tests;

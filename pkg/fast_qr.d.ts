@@ -1,6 +1,14 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+ * Generate a PNG QR code from a string.
+ */
+export function qr_image(content: string, options: SvgOptions): Uint8Array;
+/**
+ * Generate a tiny grayscale PNG QR code from a string.
+ */
+export function qr_smol_image(content: string, options: any): Uint8Array;
+/**
  * Generate a QR code from a string. All parameters are automatically set.
  */
 export function qr(content: string): Uint8Array;
@@ -246,25 +254,21 @@ export enum Version {
 export class SvgOptions {
   free(): void;
   /**
-   * Updates the shape of the QRCode modules.
+   * Updates the size of the image. (unit being module size).
    */
-  shape(shape: Shape): SvgOptions;
+  image_size(size: number): SvgOptions;
   /**
    * Updates the module color of the QRCode. Tales a string in the format `#RRGGBB[AA]`.
    */
   module_color(module_color: string): SvgOptions;
   /**
-   * Updates the margin of the QRCode.
+   * Updates the position of the image. Takes an array [x, y] (unit being module size).
    */
-  margin(margin: number): SvgOptions;
+  image_position(image_position: Float64Array): SvgOptions;
   /**
    * Updates the background color of the QRCode. Tales a string in the format `#RRGGBB[AA]`.
    */
   background_color(background_color: string): SvgOptions;
-  /**
-   * Updates the image of the QRCode. Takes base64 or a url.
-   */
-  image(image: string): SvgOptions;
   /**
    * Updates the background color of the image. Takes a string in the format `#RRGGBB[AA]`.
    */
@@ -274,52 +278,60 @@ export class SvgOptions {
    */
   image_background_shape(image_background_shape: ImageBackgroundShape): SvgOptions;
   /**
-   * Updates the size of the image. (unit being module size).
-   */
-  image_size(size: number): SvgOptions;
-  /**
-   * Updates the gap between background color and the image. (unit being module size).
-   */
-  image_gap(gap: number): SvgOptions;
-  /**
-   * Updates the position of the image. Takes an array [x, y] (unit being module size).
-   */
-  image_position(image_position: Float64Array): SvgOptions;
-  /**
    * Updates the error correction level of the QRCode (can increase the size of the QRCode)
    */
   ecl(ecl: ECL): SvgOptions;
+  /**
+   * Creates a new SvgOptions object.
+   */
+  constructor();
+  /**
+   * Updates the image of the QRCode. Takes base64 or a url.
+   */
+  image(image: string): SvgOptions;
+  /**
+   * Updates the shape of the QRCode modules.
+   */
+  shape(shape: Shape): SvgOptions;
+  /**
+   * Updates the margin of the QRCode.
+   */
+  margin(margin: number): SvgOptions;
   /**
    * Forces the version of the QRCode
    */
   version(version: Version): SvgOptions;
   /**
-   * Creates a new SvgOptions object.
+   * Updates the gap between background color and the image. (unit being module size).
    */
-  constructor();
+  image_gap(gap: number): SvgOptions;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly qr: (a: number, b: number) => [number, number];
   readonly __wbg_svgoptions_free: (a: number, b: number) => void;
-  readonly svgoptions_shape: (a: number, b: number) => number;
-  readonly svgoptions_module_color: (a: number, b: number, c: number) => number;
-  readonly svgoptions_margin: (a: number, b: number) => number;
+  readonly qr: (a: number, b: number) => [number, number];
+  readonly qr_image: (a: number, b: number, c: number) => [number, number];
+  readonly qr_smol_image: (a: number, b: number, c: any) => [number, number];
+  readonly qr_svg: (a: number, b: number, c: number) => [number, number];
   readonly svgoptions_background_color: (a: number, b: number, c: number) => number;
+  readonly svgoptions_ecl: (a: number, b: number) => number;
   readonly svgoptions_image: (a: number, b: number, c: number) => number;
   readonly svgoptions_image_background_color: (a: number, b: number, c: number) => number;
   readonly svgoptions_image_background_shape: (a: number, b: number) => number;
-  readonly svgoptions_image_size: (a: number, b: number) => number;
   readonly svgoptions_image_gap: (a: number, b: number) => number;
   readonly svgoptions_image_position: (a: number, b: number, c: number) => number;
-  readonly svgoptions_ecl: (a: number, b: number) => number;
-  readonly svgoptions_version: (a: number, b: number) => number;
+  readonly svgoptions_image_size: (a: number, b: number) => number;
+  readonly svgoptions_margin: (a: number, b: number) => number;
+  readonly svgoptions_module_color: (a: number, b: number, c: number) => number;
   readonly svgoptions_new: () => number;
-  readonly qr_svg: (a: number, b: number, c: number) => [number, number];
-  readonly __wbindgen_export_0: WebAssembly.Table;
+  readonly svgoptions_shape: (a: number, b: number) => number;
+  readonly svgoptions_version: (a: number, b: number) => number;
+  readonly __wbindgen_exn_store: (a: number) => void;
+  readonly __externref_table_alloc: () => number;
+  readonly __wbindgen_export_2: WebAssembly.Table;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;

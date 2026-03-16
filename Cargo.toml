@@ -21,13 +21,17 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 resvg = { version = "0.45.1", optional = true }
 
-
 [features]
 svg = []
 image = ["svg", "dep:resvg"]
 wasm-bindgen = ["dep:wasm-bindgen"]
 
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+napi = { version = "3.3", default-features = false, features = ["napi4", "dyn-symbols"] }
+napi-derive = "3.2"
+
 [target.'cfg(target_arch = "wasm32")'.dependencies]
+js-sys = "0.3"
 wasm-bindgen = { version = "0.2", optional = true }
 
 [profile.release]

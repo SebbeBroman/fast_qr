@@ -1,4 +1,10 @@
-import init, { Version, Shape, SvgOptions, qr_svg } from "../pkg/fast_qr.mjs";
+import init, {
+  Version,
+  Shape,
+  SvgOptions,
+  qr_smol_image,
+  qr_svg,
+} from "../pkg/fast_qr.js";
 import fs from "node:fs";
 
 const url = new URL("../pkg/fast_qr_bg.wasm", import.meta.url);
@@ -16,3 +22,9 @@ const options = new SvgOptions()
   );
 const svg = qr_svg(`https://example.com/`, options);
 console.log(svg);
+
+const smol = qr_smol_image(
+  `https://example.com/`,
+  { version: Version.V03, scale: 4, quietZone: 4 },
+);
+fs.writeFileSync("example-smol.png", smol);

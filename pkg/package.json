@@ -15,6 +15,7 @@
     "fast_qr.js",
     "fast_qr.d.ts"
   ],
+  "type": "module",
   "module": "fast_qr.js",
   "homepage": "https://fast-qr.com/",
   "types": "fast_qr.d.ts",
